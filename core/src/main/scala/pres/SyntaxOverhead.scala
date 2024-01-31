@@ -1,13 +1,13 @@
 package pres
 
-import zio.{Task, ZIO}
-
 object SyntaxOverhead {
   case class Passenger()
   case class RocketStage()
   case class LaunchParams(rocketStages: List[RocketStage], farAway: Boolean)
 
   object Zio {
+    import zio.{Task, ZIO}
+    
     def fetchPassengers(): Task[List[Passenger]] = ???
     def prepareLaunch(passengers: List[Passenger]): Task[LaunchParams] = ???
     def attachBoosterRockets(): Task[Unit] = ???
@@ -24,6 +24,8 @@ object SyntaxOverhead {
   }
 
   object ZioDirect {
+    import zio.{Task, ZIO}
+    
     def fetchPassengers(): Task[List[Passenger]] = ???
     def prepareLaunch(passengers: List[Passenger]): Task[LaunchParams] = ???
     def attachBoosterRockets(): Task[Unit] = ???
@@ -60,7 +62,8 @@ object SyntaxOverhead {
       attachBoosterRockets()
     }
 
-    params.rocketStages.foreach(stage => fuelUp(stage))
+    import ox.syntax.foreachPar
+    params.rocketStages.foreachPar(Int.MaxValue)(stage => fuelUp(stage))
 
     pressBigRedButton()
   }
@@ -93,6 +96,7 @@ object SyntaxOverhead {
     def fuelUp(stage: RocketStage): Unit < IOs = ???
     def pressBigRedButton(): Unit < IOs = ???
 
+    // Fibers subsumes IOs
     val result: Unit < Fibers = defer {
       val passengers = await(fetchPassengers())
       val params = await(prepareLaunch(passengers))
@@ -101,6 +105,7 @@ object SyntaxOverhead {
         await(attachBoosterRockets())
       }
 
+      // foreach doesn't work
       await(Fibers.parallel(params.rocketStages.map(stage => fuelUp(stage))))
 
       await(pressBigRedButton())
