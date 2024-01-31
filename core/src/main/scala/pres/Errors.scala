@@ -1,13 +1,13 @@
 package pres
 
-import kyo._
+import kyo.*
 import zio.{Console, ZIO, ZIOAppDefault}
 
 abstract class AppException extends Exception
 class UserNotFoundException extends AppException
 class InvalidPasswordException extends AppException
 
-object ZioHandleErrors extends ZIOAppDefault {
+object ZioHandleErrors extends ZIOAppDefault:
   override def run: ZIO[Any, Exception, Any] =
     val failingProgram: ZIO[Any, AppException, Nothing] = ZIO.fail(UserNotFoundException())
 
@@ -20,9 +20,8 @@ object ZioHandleErrors extends ZIOAppDefault {
       r2 <- result2
       _ <- Console.printLine(r2)
     } yield ()
-}
 
-object ZioDefects extends ZIOAppDefault {
+object ZioDefects extends ZIOAppDefault:
   override def run: ZIO[Any, Exception, Any] =
     val failingProgram: ZIO[Any, AppException, Int] = ZIO.succeed(1 / 0)
     val result1: ZIO[Any, Nothing, Int] = failingProgram.catchAll { case _: Exception => ZIO.succeed(42) }
@@ -32,9 +31,8 @@ object ZioDefects extends ZIOAppDefault {
       r <- result2
       _ <- Console.printLine(r)
     } yield ()
-}
 
-object ZioDirectHandleErrors extends ZIOAppDefault {
+object ZioDirectHandleErrors extends ZIOAppDefault:
   override def run: ZIO[Any, Exception, Any] =
     import zio.direct._
     // throwing doesn't seem to be supported directly; plus the "happy branch" is always required
@@ -49,9 +47,8 @@ object ZioDirectHandleErrors extends ZIOAppDefault {
     }
 
     failingProgram1 *> failingProgram2
-}
 
-object OxHandleErrors extends App {
+object OxHandleErrors extends App:
   def failingProgram: Nothing = throw UserNotFoundException()
 
   def result1 = try failingProgram
@@ -62,9 +59,8 @@ object OxHandleErrors extends App {
 
   println(result1)
   println(result2)
-}
 
-object KyoHandleErrors extends KyoApp { // direct - no throw support
+object KyoHandleErrors extends KyoApp: // direct - no throw support
   val failingProgram: String < Tries = Tries.fail(UserNotFoundException())
   val result1: String < Any = Tries.handle(failingProgram) { case _: UserNotFoundException => "Caught" }
 
@@ -74,4 +70,3 @@ object KyoHandleErrors extends KyoApp { // direct - no throw support
   run {
     Consoles.println(result1).map(_ => Consoles.println(result2))
   }
-}

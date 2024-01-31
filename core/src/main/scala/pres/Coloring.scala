@@ -1,14 +1,14 @@
 package pres
 
-import kyo._
+import kyo.*
 import zio.ZIO
 
-object Coloring {
+object Coloring:
   case class RocketStage()
   case class RocketNose()
   case class Rocket(stages: List[RocketStage], nose: RocketNose)
 
-  object Zio {
+  object Zio:
     def createStages: ZIO[Any, Nothing, List[RocketStage]] = ???
     def createNose: ZIO[Any, Nothing, RocketNose] = ???
 
@@ -17,9 +17,8 @@ object Coloring {
         stages <- createStages
         nose <- createNose
       } yield Rocket(stages, nose)
-  }
 
-  object Kyo {
+  object Kyo:
     def createStages: List[RocketStage] < IOs = ???
     def createNose: RocketNose < IOs = ???
 
@@ -28,9 +27,8 @@ object Coloring {
         stages <- createStages
         nose <- createNose
       } yield Rocket(stages, nose)
-  }
 
-  object Ox {
+  object Ox:
     def createStages: List[RocketStage] = ???
     def createNose: RocketNose = ???
 
@@ -38,5 +36,3 @@ object Coloring {
       val stages = createStages
       val nose = createNose
       Rocket(stages, nose)
-  }
-}

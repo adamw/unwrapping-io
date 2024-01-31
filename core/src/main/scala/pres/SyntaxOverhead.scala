@@ -1,11 +1,11 @@
 package pres
 
-object SyntaxOverhead {
+object SyntaxOverhead:
   case class Passenger()
   case class RocketStage()
   case class LaunchParams(rocketStages: List[RocketStage], farAway: Boolean)
 
-  object Zio {
+  object Zio:
     import zio.{Task, ZIO}
     
     def fetchPassengers(): Task[List[Passenger]] = ???
@@ -21,9 +21,8 @@ object SyntaxOverhead {
       _ <- ZIO.foreachParDiscard(params.rocketStages)(fuelUp)
       _ <- pressBigRedButton()
     } yield ()
-  }
 
-  object ZioDirect {
+  object ZioDirect:
     import zio.{Task, ZIO}
     
     def fetchPassengers(): Task[List[Passenger]] = ???
@@ -32,7 +31,7 @@ object SyntaxOverhead {
     def fuelUp(stage: RocketStage): Task[Unit] = ???
     def pressBigRedButton(): Task[Unit] = ???
 
-    import zio.direct._
+    import zio.direct.*
     val result: Task[Unit] = defer {
       val passengers = fetchPassengers().run
       val params = prepareLaunch(passengers).run
@@ -46,9 +45,8 @@ object SyntaxOverhead {
 
       pressBigRedButton().run
     }
-  }
 
-  object Ox {
+  object Ox:
     def fetchPassengers(): List[Passenger] = ???
     def prepareLaunch(passengers: List[Passenger]): LaunchParams = ???
     def attachBoosterRockets(): Unit = ???
@@ -66,10 +64,9 @@ object SyntaxOverhead {
     params.rocketStages.foreachPar(Int.MaxValue)(stage => fuelUp(stage))
 
     pressBigRedButton()
-  }
 
-  object Kyo {
-    import kyo._
+  object Kyo:
+    import kyo.*
 
     def fetchPassengers(): List[Passenger] < IOs = ???
     def prepareLaunch(passengers: List[Passenger]): LaunchParams < IOs = ???
@@ -84,11 +81,10 @@ object SyntaxOverhead {
       _ <- Fibers.parallel(params.rocketStages.map(stage => fuelUp(stage)))
       _ <- pressBigRedButton()
     } yield ()
-  }
 
-  object KyoDirect {
-    import kyo._
-    import kyo.direct._
+  object KyoDirect:
+    import kyo.*
+    import kyo.direct.*
 
     def fetchPassengers(): List[Passenger] < IOs = ???
     def prepareLaunch(passengers: List[Passenger]): LaunchParams < IOs = ???
@@ -110,5 +106,3 @@ object SyntaxOverhead {
 
       await(pressBigRedButton())
     }
-  }
-}
