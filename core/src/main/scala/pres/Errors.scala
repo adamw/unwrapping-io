@@ -48,7 +48,7 @@ object ZioDirectHandleErrors extends ZIOAppDefault:
 
     failingProgram1 *> failingProgram2
 
-object OxHandleErrors extends App:
+object DirectHandleErrors extends App:
   def failingProgram: Nothing = throw UserNotFoundException()
 
   def result1 = try failingProgram

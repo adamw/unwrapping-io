@@ -28,7 +28,7 @@ object Coloring:
         nose <- createNose
       } yield Rocket(stages, nose)
 
-  object Ox:
+  object Direct:
     def createStages: List[RocketStage] = ???
     def createNose: RocketNose = ???
 

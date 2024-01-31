@@ -7,7 +7,7 @@ object SyntaxOverhead:
 
   object Zio:
     import zio.{Task, ZIO}
-    
+
     def fetchPassengers(): Task[List[Passenger]] = ???
     def prepareLaunch(passengers: List[Passenger]): Task[LaunchParams] = ???
     def attachBoosterRockets(): Task[Unit] = ???
@@ -24,7 +24,7 @@ object SyntaxOverhead:
 
   object ZioDirect:
     import zio.{Task, ZIO}
-    
+
     def fetchPassengers(): Task[List[Passenger]] = ???
     def prepareLaunch(passengers: List[Passenger]): Task[LaunchParams] = ???
     def attachBoosterRockets(): Task[Unit] = ???
@@ -46,7 +46,7 @@ object SyntaxOverhead:
       pressBigRedButton().run
     }
 
-  object Ox:
+  object Direct:
     def fetchPassengers(): List[Passenger] = ???
     def prepareLaunch(passengers: List[Passenger]): LaunchParams = ???
     def attachBoosterRockets(): Unit = ???

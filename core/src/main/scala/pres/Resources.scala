@@ -20,12 +20,12 @@ object Resources:
 
     val firstByte: Int < IOs = kyo.Resources.run(file.map(_.read()))
 
-  object Ox:
+  object Direct:
     val file = new FileInputStream("file.txt")
     try
       val firstByte = file.read()
     finally file.close()
 
-  object OxLeak:
+  object DirectLeak:
     val file = new FileInputStream("file.txt")
     val firstByte = file.read()
