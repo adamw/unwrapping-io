@@ -457,6 +457,89 @@
 						</table>
 					</textarea>
 				</section>
+				<section data-markdown>
+					<textarea data-template>
+						### Coloring
+
+						```scala
+						case class RocketStage()
+						case class RocketNose()
+						case class Rocket(stages: List[RocketStage], nose: RocketNose)
+						```
+
+						---
+
+						### Coloring: ZIO
+
+						```scala
+						def createStages: ZIO[Any, Nothing, List[RocketStage]] = ???
+						def createNose: ZIO[Any, Nothing, RocketNose] = ???
+
+						def assembleRocket = ??? // call createStages, createNose
+
+						```
+
+
+						---
+						<!-- .element: data-transition="none" -->
+
+						### Coloring: ZIO
+
+						```scala
+						def createStages: ZIO[Any, Nothing, List[RocketStage]] = ???
+						def createNose: ZIO[Any, Nothing, RocketNose] = ???
+
+						def assembleRocket: ZIO[Any, Nothing, Rocket] =
+						  for {
+						    stages <- createStages
+						    nose <- createNose
+						  } yield Rocket(stages, nose)
+						```
+
+						---
+
+						### Coloring: Direct
+
+						```scala
+						def createStages: List[RocketStage] = ???
+						def createNose: RocketNose = ???
+
+						def assembleRocket: Rocket =
+						  val stages = createStages
+						  val nose = createNose
+						  Rocket(stages, nose)
+						```
+
+						---
+
+						### Coloring: summary
+
+						<table>
+						<thead>
+							<tr>
+								<th></th>
+								<th>Coloring</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>ZIO</td>
+								<td style="background-color: #B71C1C; text-align: center;">yes</td>
+							</tr>
+							<tr>
+								<td>ZIO-direct</td>
+								<td style="background-color: #B71C1C; text-align: center;">yes</td>
+							</tr>
+							<tr>
+								<td>Direct</td>
+								<td style="background-color: #558B2F; text-align: center;">no</td>
+							</tr>
+						</tbody>
+						</table>
+
+						Is "yes" really red, though?
+					</textarea>
+				</section>
 			</div>
 		</div>
 
