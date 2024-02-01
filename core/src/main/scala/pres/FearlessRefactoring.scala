@@ -53,19 +53,19 @@ object ZioDirectFearlessRefactoringAfter2 extends ZIOAppDefault:
     }
   }
 
-object DirectFearlessRefactoringBefore extends App:
+@main def directFearlessRefactoringBefore(): Unit =
   println("Prepare ...")
   println("Launching rockets")
   println("Launching rockets")
 
-object DirectFearlessRefactoringAfter1 extends App:
+@main def directFearlessRefactoringAfter1(): Unit =
   val launch = println("Launching rockets")
 
   println("Prepare ...")
   launch
   launch
 
-object DirectFearlessRefactoringAfter2 extends App:
+@main def directFearlessRefactoringAfter2(): Unit =
   def launch = println("Launching rockets")
 
   println("Prepare ...")

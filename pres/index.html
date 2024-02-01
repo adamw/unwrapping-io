@@ -540,6 +540,179 @@
 						Is "yes" really red, though?
 					</textarea>
 				</section>
+				<section data-markdown>
+					<textarea data-template>
+						### Fearless refactoring: ZIO
+
+						```scala
+						for {
+						  _ <- Console.printLine("Prepare ...")
+						  _ <- Console.printLine("Launching rockets")
+						  _ <- Console.printLine("Launching rockets")
+						} yield ()
+						```
+
+						---
+						<!-- .element: data-transition="none" -->
+
+						### Fearless refactoring: ZIO
+
+						```scala
+						val launch = Console.printLine("Launching rockets")
+
+						override def run: ZIO[Any, Exception, Unit] = for {
+						  _ <- Console.printLine("Prepare ...")
+						  _ <- launch
+						  _ <- launch
+						} yield ()
+						```
+
+						still gives:
+
+						```
+						Prepare ...
+						Launching rockets
+						Launching rockets
+						```
+
+						---
+
+						### Fearless refactoring: ZIO-direct
+
+						```scala
+						import zio.direct.*
+						defer {
+						  Console.printLine("Prepare ...").run
+						  Console.printLine("Launching rockets").run
+						  Console.printLine("Launching rockets").run
+						}
+						```
+
+						---
+						<!-- .element: data-transition="none" -->
+
+						### Fearless refactoring: ZIO-direct
+
+						```scala
+						import zio.direct.*
+						defer {
+						  val launch = Console.printLine("Launching rockets").run
+
+						  Console.printLine("Prepare ...").run
+						  launch
+						  launch
+						}
+						```
+
+						gives:
+
+						```
+						Launching rockets
+						Prepare ...
+						```
+
+						---
+						<!-- .element: data-transition="none" -->
+
+						### Fearless refactoring: ZIO-direct
+
+						```scala
+						defer {
+						  val launch = Console.printLine("Launching rockets")
+
+						  Console.printLine("Prepare ...").run
+						  launch.run
+						  launch.run
+						}
+						```
+
+						gives:
+
+						```
+						Prepare ...
+						Launching rockets
+						Launching rockets
+						```
+
+						---
+
+						### Fearless refactoring: Direct
+
+						```scala
+						println("Prepare ...")
+						println("Launching rockets")
+						println("Launching rockets")
+						```
+
+						---
+						<!-- .element: data-transition="none" -->
+
+						### Fearless refactoring: Direct
+
+						```scala
+						val launch = println("Launching rockets")
+
+						println("Prepare ...")
+						launch
+						launch
+						```
+
+						gives:
+
+						```
+						Launching rockets
+						Prepare ...
+						```
+
+						---
+						<!-- .element: data-transition="none" -->
+
+						### Fearless refactoring: Direct
+
+						```scala
+						def launch = println("Launching rockets")
+
+						println("Prepare ...")
+						launch
+						launch
+						```
+
+						gives:
+
+						```
+						Prepare ...
+						Launching rockets
+						Launching rockets
+						```
+
+						---
+
+						### Fearless refactoring: summary
+
+						<table>
+						<thead>
+							<tr>
+								<th></th>
+								<th>Fearless refactoring</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>ZIO</td>
+								<td style="background-color: #558B2F; text-align: center;">yes</td>
+							</tr>
+							<tr>
+								<td>ZIO-direct</td>
+								<td style="background-color: #F57F17; text-align: center;">some</td>
+							</tr>
+							<tr>
+								<td>Direct</td>
+								<td style="background-color: #B71C1C; text-align: center;">no</td>
+							</tr>
+						</tbody>
+						</table>
+					</textarea>
+				</section>
 			</div>
 		</div>
 
