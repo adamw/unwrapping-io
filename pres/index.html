@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>reveal.js</title>
+
+		<link rel="stylesheet" href="dist/reset.css">
+		<link rel="stylesheet" href="dist/reveal.css">
+		<link rel="stylesheet" href="dist/theme/night.css">
+
+		<!-- Theme used for syntax highlighted code -->
+		<link rel="stylesheet" href="plugin/highlight/monokai.css">
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+				<section data-markdown>
+					<textarea data-template>
+						##
+						## Unwrapping IO
+						#### Is it a path that you want to follow?
+
+						&nbsp;
+
+						Adam Warski, February 2024
+
+						<a href="https://twitter.com/adamwarski">@adamwarski</a> / @softwaremill.social / softwaremill.com
+
+						<img src="img/sml.png" alt="SoftwareMill logo" style="height: 180px;">
+					</textarea>
+				</section>
+				<section>
+					<h2>How did we end up with IOs?</h2>
+					<ul>
+						<li class="fragment">thread-per-request</li>
+						<li class="fragment">callbacks</li>
+						<li class="fragment"><code>Future</code>s</li>
+						<li class="fragment"><code>IO</code>s</li>
+					</ul>
+				</section>
+				<section>
+					<h2>What did Loom introduce in Java 21?</h2>
+					<ul>
+						<li class="fragment">lightweight threads in the JVM</li>
+						<li class="fragment">built-in runtime</li>
+						<li class="fragment">retrofitting blocking operations</li>
+					</ul>
+
+					<p>Goal: simplify asynchronous programming<p>
+				</section>
+				<section data-markdown>
+					<textarea data-template>
+						Same underlying idea:
+
+						multiple
+
+						**threads** / **fibers**
+
+						are scheduled to run on a small pool of
+
+						**platform / OS threads**
+
+						---
+
+						### Problems that Loom tries to solve:
+
+						1. lost control flow
+						2. lost context
+						3. viral
+
+						---
+
+						### Scala's functional effect libraries
+
+						What started as "better Futures", ended up bringing convenience and safety to many more areas
+
+						---
+
+						- error handling
+						- resource management
+						- refactoring
+						- interruptions
+						- high-level concurrency
+						- streaming
+						- ...
+
+						---
+
+						### Functional vs. direct
+
+						Which one to choose?
+
+						Definitely **not** a no-brainer!
+						Let's try no to throw out the baby with the bathwater!
+
+						---
+
+						### Contenders
+
+						* Futures: Scala's std lib, Pekko, Akka
+						* Functional: cats-effect, ZIO, kyo
+						* Direct: ox, gears
+
+						---
+
+						### Let's zoom in ...
+
+						* Futures: Scala's std lib, Pekko, Akka
+						* Functional: cats-effect, **ZIO**, **kyo**
+						* Functional+direct: cats-effect-cps, **ZIO-direct**, **kyo-direct**
+						* Direct: **ox**, gears
+					</textarea>
+				</section>
+				<section data-markdown>
+					<textarea data-template>
+						### Syntax overhead: ZIO
+
+						```scala
+						import zio.{Task, ZIO}
+
+						def fetchPassengers(): Task[List[Passenger]] = ???
+						def prepareLaunch(ps: List[Passenger]): Task[LaunchParams] = ???
+						def attachBoosterRockets(): Task[Unit] = ???
+						def fuelUp(stage: RocketStage): Task[Unit] = ???
+						def pressBigRedButton(): Task[Unit] = ???
+						```
+
+						---
+
+						### Syntax overhead: ZIO
+
+						```scala
+						val result: Task[Unit] = for {
+						  passengers <- fetchPassengers()
+						  params <- prepareLaunch(passengers)
+						  _ <- if (params.farAway) attachBoosterRockets() else ZIO.unit
+						  _ <- ZIO.foreachDiscard(params.rocketStages)(fuelUp)
+						  _ <- pressBigRedButton()
+						} yield ()
+
+						---
+
+						### Syntax overhead: ZIO-direct
+
+						```scala
+						val result: Task[Unit] = defer {
+						  val passengers = fetchPassengers().run
+						  val params = prepareLaunch(passengers).run
+
+						  if (params.farAway) {
+						    attachBoosterRockets().run
+						  }
+
+						  params.rocketStages.foreach(stage => fuelUp(stage).run)
+
+						  pressBigRedButton().run
+						}
+						```
+
+						---
+
+						### Syntax overhead: direct
+
+						```scala
+						def fetchPassengers(): List[Passenger] = ???
+						def prepareLaunch(ps: List[Passenger]): LaunchParams = ???
+						def attachBoosterRockets(): Unit = ???
+						def fuelUp(stage: RocketStage): Unit = ???
+						def pressBigRedButton(): Unit = ???
+						```
+
+						---
+
+						### Syntax overhead: direct
+
+						```scala
+						val passengers = fetchPassengers()
+						val params = prepareLaunch(passengers)
+
+						if (params.farAway) {
+						  attachBoosterRockets()
+						}
+
+						params.rocketStages.foreach(stage => fuelUp(stage))
+
+						pressBigRedButton()
+						```
+
+						---
+
+						### Syntax overhead: summary
+
+						<table>
+						<thead>
+							<tr>
+								<th></th>
+								<th>Syntax overhead</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>ZIO</td>
+								<td style="background-color: #B71C1C; text-align: center;">high</td>
+							</tr>
+							<tr>
+								<td>ZIO-direct</td>
+								<td style="background-color: #F57F17; text-align: center;">mixed</td>
+							</tr>
+							<tr>
+								<td>Direct</td>
+								<td style="background-color: #558B2F; text-align: center;">low</td>
+							</tr>
+						</tbody>
+						</table>
+					</textarea>
+				</section>
+			</div>
+		</div>
+
+		<script src="dist/reveal.js"></script>
+		<script src="plugin/notes/notes.js"></script>
+		<script src="plugin/markdown/markdown.js"></script>
+		<script src="plugin/highlight/highlight.js"></script>
+		<script>
+			// More info about initialization & config:
+			// - https://revealjs.com/initialization/
+			// - https://revealjs.com/config/
+			Reveal.initialize({
+				hash: true,
+
+				// Learn about plugins: https://revealjs.com/plugins/
+				plugins: [ RevealMarkdown, RevealHighlight, RevealNotes ]
+			});
+		</script>
+	</body>
+</html>
