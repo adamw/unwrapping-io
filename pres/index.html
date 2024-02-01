@@ -825,6 +825,121 @@
 						</table>
 					</textarea>
 				</section>
+				<section data-markdown>
+					<textarea data-template>
+						### Supervision: ZIO
+
+						```scala [2-3|6|8|10-11]
+						val child =
+						  (ZIO.sleep(1.second) *> Console.printLine("Working ..."))
+						  .forever.fork
+
+						val work = Console.printLine("Starting to work ...") *>
+						  child *>
+						  ZIO.sleep(3.seconds) *>
+						  ZIO.fail("Boom!")
+
+						work.catchAll(e => Console.printLine(s"Failed: $e")) *>
+						  ZIO.sleep(3.seconds)
+						```
+
+						gives:
+
+						```
+						Starting to work ...
+						Working ...
+						Working ...
+						Working ...
+						Failed: Boom!
+						Working ...
+						Working ...
+						Working ...
+						```
+
+						---
+
+						### Supervision: ZIO
+
+						```scala [10]
+						val child =
+						  (ZIO.sleep(1.second) *> Console.printLine("Working ..."))
+						  .forever.fork
+
+						val work = Console.printLine("Starting to work ...") *>
+						  child *>
+						  ZIO.sleep(3.seconds) *>
+						  ZIO.fail("Boom!")
+
+						work.fork.flatMap(_.join)
+						  .catchAll(e => Console.printLine(s"Failed: $e")) *>
+						  ZIO.sleep(3.seconds)
+						```
+
+						gives:
+
+						```
+						Starting to work ...
+						Working ...
+						Working ...
+						Working ...
+						Failed: Boom!
+						```
+
+						---
+
+						### Supervision: Ox
+
+						```scala [1|4|6-11|13]
+						def child()(using Ox) = {
+						  Thread.sleep(1000);
+						  println("Working ...")
+						}.forever.fork
+
+						def work() = supervised {
+						  println("Starting to work ...")
+						  child()
+						  Thread.sleep(3000)
+						  throw new Exception("Boom!")
+						}
+
+						try work()
+						catch case e: Exception => println(s"Failed: $e")
+						Thread.sleep(3000)
+						```
+
+						gives:
+
+						```
+						Starting to work ...
+						Working ...
+						Working ...
+						Failed: java.lang.Exception: Boom!
+						```
+
+						---
+
+						### Supervision: summary
+
+						<table>
+						<thead>
+							<tr>
+								<th></th>
+								<th>Supervision</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>ZIO</td>
+								<td style="background-color: #F57F17; text-align: center;">some</td>
+							</tr>
+							<tr>
+								<td>Ox</td>
+								<td style="background-color: #558B2F; text-align: center;">yes</td>
+							</tr>
+						</tbody>
+						</table>
+					</textarea>
+				</section>
 			</div>
 		</div>
 

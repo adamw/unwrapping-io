@@ -34,7 +34,7 @@ object KyoSupervision extends kyo.KyoApp:
     handled.map(e => Consoles.println(s"Failed: $e")).map(_ => Fibers.sleep(3.seconds))
   }
 
-object OxSupervision extends App:
+@main def oxSupervision(): Unit =
   import ox.*
   import ox.syntax.*
 
