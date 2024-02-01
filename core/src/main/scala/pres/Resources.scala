@@ -55,3 +55,11 @@ object Resources:
   object DirectLeak:
     val file = new FileInputStream("file.txt")
     val firstByte = file.read()
+
+  object OxMulti:
+    import ox.*
+    supervised {
+      val file1 = useCloseableInScope(new FileInputStream("file1.txt"))
+      val file2 = useCloseableInScope(new FileInputStream("file2.txt"))
+      file1.read() + file2.read()
+    }

@@ -713,6 +713,118 @@
 						</table>
 					</textarea>
 				</section>
+				<section data-markdown>
+					<textarea data-template>
+						### Resource management: ZIO
+
+						```scala [2-4|1|6-8]
+						val file: ZIO[Scope, Throwable, FileInputStream] =
+						  ZIO.acquireRelease(
+						    ZIO.attempt(new FileInputStream("file.txt")))(in =>
+						    ZIO.attempt(in.close()).catchAll(...))
+
+						val firstByte: ZIO[Any, Throwable, Int] = ZIO.scoped {
+						  file.flatMap(is => ZIO.attempt(is.read()))
+						}
+						```
+
+						---
+
+						### Resource management: ZIO
+
+						```scala
+						def file(name: String): ZIO[Scope, Throwable, FileInputStream] =
+						  ZIO.acquireRelease(...)
+
+						val sum: ZIO[Any, Throwable, Int] = ZIO.scoped {
+						  for {
+						    f1 <- file("file1.txt")
+						    f2 <- file("file2.txt")
+						  } yield f1.read() + f2.read()
+						}
+						```
+
+						---
+
+						### Resource management: Direct
+
+						```scala
+						val file = new FileInputStream("file.txt")
+						try
+						  val firstByte = file.read()
+						finally file.close()
+						```
+
+						---
+						<!-- .element: data-transition="none" -->
+
+						### Resource management: Direct
+
+						```scala
+						Using(new FileInputStream("file.txt")) { file =>
+						  val firstByte = file.read()
+						}
+						```
+
+						---
+						<!-- .element: data-transition="none" -->
+
+						### Resource management: Direct
+
+						```scala
+						val file = new FileInputStream("file.txt")
+						val firstByte = file.read()
+						```
+
+						---
+
+						### Resource management: Direct
+
+						```scala
+						Using(new FileInputStream("file1.txt")) { file1 =>
+						  Using(new FileInputStream("file2.txt")) { file2 =>
+						    file1.read() + file2.read()
+						  }
+						}
+						```
+
+						---
+						<!-- .element: data-transition="none" -->
+
+						### Resource management: Direct
+
+						```scala
+						supervised {
+						  val file1 = useCloseableInScope(new FileInputStream("f1.txt"))
+						  val file2 = useCloseableInScope(new FileInputStream("f2.txt"))
+						  file1.read() + file2.read()
+						}
+						```
+
+						---
+
+						### Resource management: summary
+
+						<table>
+						<thead>
+							<tr>
+								<th></th>
+								<th>Resource management</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>ZIO</td>
+								<td style="background-color: #558B2F; text-align: center;">safe</td>
+							</tr>
+							<tr>
+								<td>Direct + Ox</td>
+								<td style="background-color: #F57F17; text-align: center;">some</td>
+							</tr>
+						</tbody>
+						</table>
+					</textarea>
+				</section>
 			</div>
 		</div>
 
