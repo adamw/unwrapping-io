@@ -1040,6 +1040,54 @@
 						</table>
 					</textarea>
 				</section>
+				<section data-markdown>
+					<textarea data-template>
+						### High-level concurrency: ZIO
+
+						```scala [5-6]
+						def lookupInCache(): Task[String] = ???
+						def lookupInDb(): Task[String] = ???
+						def updateMetrics(): Task[Unit] = ???
+
+						updateMetrics().zipParRight(
+						  lookupInCache().race(lookupInDb()).timeout(1.second))
+						```
+
+						---
+
+						### High-level concurrency: Direct
+
+						```scala [5-6]
+						def lookupInCache(): String = ???
+						def lookupInDb(): String = ???
+						def updateMetrics(): Unit = ???
+
+						par(updateMetrics())(timeout(1.second)(
+						  raceSuccess(lookupInCache())(lookupInDb())))._2
+						```
+
+						---
+
+						<table>
+						<thead>
+							<tr>
+								<th></th>
+								<th>Interruptions</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>ZIO</td>
+								<td style="background-color: #558B2F; text-align: center;">yes</td>
+							</tr>
+							<tr>
+								<td>Direct + Ox</td>
+								<td style="background-color: #F57F17; text-align: center;">some</td>
+							</tr>
+						</tbody>
+						</table>
+					</textarea>
+				</section>
 			</div>
 		</div>
 

@@ -31,4 +31,4 @@ object HighLevel:
     def lookupInDb(): String = ???
     def updateMetrics(): Unit = ???
 
-    par(updateMetrics())(timeout(1.second)(raceSuccess(lookupInCache())(lookupInDb())))
+    par(updateMetrics())(timeout(1.second)(raceSuccess(lookupInCache())(lookupInDb())))._2
