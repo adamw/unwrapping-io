@@ -191,8 +191,6 @@
 
 						---
 
-						### Syntax overhead: summary
-
 						<table>
 						<thead>
 							<tr>
@@ -344,8 +342,6 @@
 
 						---
 
-						### Error handling: summary
-
 						<table>
 						<thead>
 							<tr>
@@ -431,8 +427,6 @@
 
 						---
 
-						### Stack traces: summary
-
 						<table>
 						<thead>
 							<tr>
@@ -511,8 +505,6 @@
 						```
 
 						---
-
-						### Coloring: summary
 
 						<table>
 						<thead>
@@ -687,8 +679,6 @@
 
 						---
 
-						### Fearless refactoring: summary
-
 						<table>
 						<thead>
 							<tr>
@@ -803,8 +793,6 @@
 
 						---
 
-						### Resource management: summary
-
 						<table>
 						<thead>
 							<tr>
@@ -918,8 +906,6 @@
 
 						---
 
-						### Supervision: summary
-
 						<table>
 						<thead>
 							<tr>
@@ -935,6 +921,120 @@
 							<tr>
 								<td>Ox</td>
 								<td style="background-color: #558B2F; text-align: center;">yes</td>
+							</tr>
+						</tbody>
+						</table>
+					</textarea>
+				</section>
+				<section data-markdown>
+					<textarea data-template>
+						### Interruptions: ZIO
+
+						```scala [2,5|3-4|11,13]
+						val child =
+						  (ZIO.sleep(1.second) *> Console.printLine("Working ..."))
+						    .resurrect
+						    .catchAll(e => ZIO.logError("Error"))
+						    .forever
+						    .fork
+
+						val work = for {
+						  _ <- Console.printLine("Starting child ...")
+						  f <- child
+						  _ <- ZIO.sleep(3.seconds)
+						  _ <- Console.printLine("Bye!")
+						  _ <- f.interrupt
+						} yield ()
+						```
+
+						gives:
+
+						```
+						Starting child ...
+						Working ...
+						Working ...
+						Bye!
+						```
+
+						---
+
+						### Interruptions: Direct
+
+						```scala [4,6|5|8-13|5]
+						def child()(using Ox) = {
+						  try
+						    Thread.sleep(1000)
+						    println("Working ...")
+						  catch case e: Exception => println("Error")
+						}.forever.forkDaemon
+
+						def work() = supervised {
+						  println("Starting child ...")
+						  child()
+						  Thread.sleep(3000)
+						  println("Bye!")
+						}
+						```
+
+						gives:
+
+						```
+						Starting child ...
+						Working ...
+						Working ...
+						Bye!
+						Error
+						Working ...
+						```
+
+						---
+						<!-- .element: data-transition="none" -->
+
+						### Interruptions: Direct
+
+						```scala [5]
+						def child()(using Ox) = {
+						  try
+						    Thread.sleep(1000)
+						    println("Working ...")
+						  catch case NonFatal(e) => println("Error")
+						}.forever.forkDaemon
+
+						def work() = supervised {
+						  println("Starting child ...")
+						  child()
+						  Thread.sleep(3000)
+						  println("Bye!")
+						}
+						```
+
+						gives:
+
+						```
+						Starting child ...
+						Working ...
+						Working ...
+						Bye!
+						Error
+						```
+
+						---
+
+						<table>
+						<thead>
+							<tr>
+								<th></th>
+								<th>Interruptions</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>ZIO</td>
+								<td style="background-color: #558B2F; text-align: center;">yes</td>
+							</tr>
+							<tr>
+								<td>Direct + Ox</td>
+								<td style="background-color: #F57F17; text-align: center;">some</td>
 							</tr>
 						</tbody>
 						</table>

@@ -48,7 +48,7 @@ object KyoInterruptions extends kyo.KyoApp:
     work.map(_ => Fibers.sleep(3.seconds))
   }
 
-object OxInterruptionsWrong extends App:
+@main def oxInterruptionsWrong(): Unit =
   import ox.*
 
   def child()(using Ox) =
@@ -75,7 +75,7 @@ object OxInterruptionsWrong extends App:
   Thread.sleep(3000)
   println("All done")
 
-object OxInterruptionsCorrect extends App:
+@main def oxInterruptionsCorrect(): Unit =
   import ox.*
 
   def child()(using Ox) =
