@@ -22,7 +22,7 @@ object KyoStackTraces extends KyoApp:
     d()
   }
 
-object DirectStackTraces extends App:
+@main def directStackTraces(): Unit =
   def a() = throw new Exception("boom!")
   def b() = { println("In b"); a() }
   def c() = { println("In c"); b() }

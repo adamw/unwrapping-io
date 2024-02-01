@@ -370,6 +370,93 @@
 						</table>
 					</textarea>
 				</section>
+				<section data-markdown>
+					<textarea data-template>
+						### Stack traces: ZIO
+
+						```scala
+						object ZioStackTraces extends ZIOAppDefault:
+						  override def run: ZIO[Any, Exception, Any] =
+						    def a() = ZIO.fail(new Exception("boom!"))
+						    def b() = Console.printLine("In b") *> a()
+						    def c() = Console.printLine("In c") *> b()
+						    def d() = Console.printLine("In d") *> c()
+
+						    d()
+						```
+
+						gives:
+
+						```
+						In d
+						In c
+						In b
+						timestamp=2024-02-01T14:45:56.872242Z level=ERROR
+						  cause="Exception in thread "zio-fiber-4"
+						  java.lang.Exception: boom!
+						at pres.ZioStackTraces$.a$1$$anonfun$1(StackTraces.scala:8)
+						at zio.ZIO$.fail$$anonfun$1(ZIO.scala:3148)
+						at zio.ZIO$.failCause$$anonfun$1(ZIO.scala:3157)
+						at pres.ZioStackTraces.run.a(StackTraces.scala:8)"
+						```
+
+						---
+
+						### Stack traces: direct
+
+						```scala
+						object DirectStackTraces extends App:
+						  def a() = throw new Exception("boom!")
+						  def b() = { println("In b"); a() }
+						  def c() = { println("In c"); b() }
+						  def d() = { println("In d"); c() }
+
+						  d()
+						```
+
+						gives:
+
+						```
+						In d
+						In c
+						In b
+						Exception in thread "main" java.lang.Exception: boom!
+							at pres.StackTraces.a$2(StackTraces.scala:26)
+							at pres.StackTraces.b$2(StackTraces.scala:27)
+							at pres.StackTraces.c$2(StackTraces.scala:28)
+							at pres.StackTraces.d$2(StackTraces.scala:29)
+							at pres.StackTraces.directStackTraces(StackTraces.scala:31)
+							at pres.directStackTraces.main(StackTraces.scala:25)
+						```
+
+						---
+
+						### Stack traces: summary
+
+						<table>
+						<thead>
+							<tr>
+								<th></th>
+								<th>Stack traces</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>ZIO</td>
+								<td style="background-color: #B71C1C; text-align: center;">basic</td>
+							</tr>
+							<tr>
+								<td>ZIO-direct</td>
+								<td style="background-color: #B71C1C; text-align: center;">basic</td>
+							</tr>
+							<tr>
+								<td>Direct</td>
+								<td style="background-color: #558B2F; text-align: center;">useful</td>
+							</tr>
+						</tbody>
+						</table>
+					</textarea>
+				</section>
 			</div>
 		</div>
 
