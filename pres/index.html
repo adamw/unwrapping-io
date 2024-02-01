@@ -1072,7 +1072,7 @@
 						<thead>
 							<tr>
 								<th></th>
-								<th>Interruptions</th>
+								<th>High-level concurrency</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -1086,6 +1086,132 @@
 							</tr>
 						</tbody>
 						</table>
+					</textarea>
+				</section>
+				<!-- green: #558B2F, yellow: #F57F17, red: #B71C1C -->
+				<section data-markdown>
+					<textarea data-template>
+						<table style="font-size: 25px">
+						<thead>
+							<tr>
+								<th></th>
+								<th style="min-width:170px; text-align:center">ZIO</th>
+								<th style="min-width:170px; text-align:center">ZIO-direct</th>
+								<th style="min-width:170px; text-align:center">Direct + Ox</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>Syntax overhead</td>
+								<td style="background-color: #B71C1C; text-align: center;">high</td>
+								<td style="background-color: #F57F17; text-align: center;">mixed</td>
+								<td style="background-color: #558B2F; text-align: center;">low</td>
+							</tr>
+							<tr>
+								<td>Error handling</td>
+								<td style="background-color: #558B2F; text-align: center;">safe</td>
+								<td style="background-color: #558B2F; text-align: center;">safe</td>
+								<td style="background-color: #F57F17; text-align: center;">some</td>
+							</tr>
+							<tr>
+								<td>Stack traces</td>
+								<td style="background-color: #B71C1C; text-align: center;">basic</td>
+								<td style="background-color: #B71C1C; text-align: center;">basic</td>
+								<td style="background-color: #558B2F; text-align: center;">useful</td>
+							</tr>
+							<tr>
+								<td>Coloring</td>
+								<td style="background-color: #B71C1C; text-align: center;">yes</td>
+								<td style="background-color: #B71C1C; text-align: center;">yes</td>
+								<td style="background-color: #558B2F; text-align: center;">no</td>
+							</tr>
+							<tr>
+								<td>Fearless refactoring</td>
+								<td style="background-color: #558B2F; text-align: center;">yes</td>
+								<td style="background-color: #F57F17; text-align: center;">some</td>
+								<td style="background-color: #B71C1C; text-align: center;">no</td>
+							</tr>
+							<tr>
+								<td>Resource management</td>
+								<td style="background-color: #558B2F; text-align: center;">safe</td>
+								<td style="background-color: #558B2F; text-align: center;">safe</td>
+								<td style="background-color: #F57F17; text-align: center;">some</td>
+							</tr>
+							<tr>
+								<td>Supervision</td>
+								<td style="background-color: #F57F17; text-align: center;">some</td>
+								<td style="background-color: #F57F17; text-align: center;">some</td>
+								<td style="background-color: #558B2F; text-align: center;">yes</td>
+							</tr>
+							<tr>
+								<td>Interruptions</td>
+								<td style="background-color: #558B2F; text-align: center;">yes</td>
+								<td style="background-color: #558B2F; text-align: center;">yes</td>
+								<td style="background-color: #F57F17; text-align: center;">some</td>
+							</tr>
+							<tr>
+								<td>High-level concurrency</td>
+								<td style="background-color: #558B2F; text-align: center;">yes</td>
+								<td style="background-color: #558B2F; text-align: center;">yes</td>
+								<td style="background-color: #558B2F; text-align: center;">yes</td>
+							</tr>
+							<tr>
+								<td>Testing support</td>
+								<td style="background-color: #558B2F; text-align: center;">yes</td>
+								<td style="background-color: #558B2F; text-align: center;">yes</td>
+								<td style="background-color: #F57F17; text-align: center;">some</td>
+							</tr>
+							<tr>
+								<td>Thread-locals</td>
+								<td style="background-color: #558B2F; text-align: center;">yes</td>
+								<td style="background-color: #558B2F; text-align: center;">yes</td>
+								<td style="background-color: #558B2F; text-align: center;">yes</td>
+							</tr>
+							<tr>
+								<td>Ecosystem</td>
+								<td style="background-color: #F57F17; text-align: center;">some</td>
+								<td style="background-color: #F57F17; text-align: center;">some</td>
+								<td style="background-color: #F57F17; text-align: center;">some</td>
+							</tr>
+						</tbody>
+						</table>
+					</textarea>
+				</section>
+				<section data-markdown>
+					<textarea data-template>
+						### Decisions, decisions ... ZIO
+
+						* high syntax overhead, not that useful stack traces, viral
+						* but: great error handling, safe interruptions and resources, referential transparency
+
+						---
+
+						### Decisions, decisions ... Direct
+
+						* no referential transparency, possibly unsafe interruptions and resources, no errors in signatures
+						* but: simple, low syntax overhead, useful strack traces, no coloring, structured concurrency
+
+						---
+
+						<img src="img/sml.png" alt="SoftwareMill logo" style="height: 180px;">
+
+						```
+						val SoftwareMill = "https://softwaremill.com"
+
+						val Backends = true
+						val Frontends = true
+						val ML_AI = true
+						val DevOps = true
+
+						val Consulting: List[String] = List(
+						  "Scala", "Java", "TypeScript",
+						  "Architecture", "Kafka", "RDBMS/Cassandra",
+						  "Distributed systems")
+
+						val OpenSource_Top5: List[String] = List(
+						  "sttp", "tapir", "elasticmq",
+						  "struts", "hibernate envers")
+						```
 					</textarea>
 				</section>
 			</div>
