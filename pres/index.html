@@ -122,7 +122,7 @@
 
 						def fetchPassengers(): Task[List[Passenger]] = ???
 						def prepareLaunch(ps: List[Passenger]): Task[LaunchParams] = ???
-						def attachBoosterRockets(): Task[Unit] = ???
+						def attachBoosters(): Task[Unit] = ???
 						def fuelUp(stage: RocketStage): Task[Unit] = ???
 						def pressBigRedButton(): Task[Unit] = ???
 						```
@@ -131,20 +131,21 @@
 
 						### Syntax overhead: ZIO
 
-						```scala
+						```scala [1-7|4|5]
 						val result: Task[Unit] = for {
 						  passengers <- fetchPassengers()
 						  params <- prepareLaunch(passengers)
-						  _ <- if (params.farAway) attachBoosterRockets() else ZIO.unit
+						  _ <- if params.farAway then attachBoosters() else ZIO.unit
 						  _ <- ZIO.foreachDiscard(params.rocketStages)(fuelUp)
 						  _ <- pressBigRedButton()
 						} yield ()
+						```
 
 						---
 
 						### Syntax overhead: ZIO-direct
 
-						```scala
+						```scala [1-11|5-7|9]
 						val result: Task[Unit] = defer {
 						  val passengers = fetchPassengers().run
 						  val params = prepareLaunch(passengers).run
@@ -166,7 +167,7 @@
 						```scala
 						def fetchPassengers(): List[Passenger] = ???
 						def prepareLaunch(ps: List[Passenger]): LaunchParams = ???
-						def attachBoosterRockets(): Unit = ???
+						def attachBoosters(): Unit = ???
 						def fuelUp(stage: RocketStage): Unit = ???
 						def pressBigRedButton(): Unit = ???
 						```
@@ -175,12 +176,12 @@
 
 						### Syntax overhead: direct
 
-						```scala
+						```scala [1-10|4-6|8]
 						val passengers = fetchPassengers()
 						val params = prepareLaunch(passengers)
 
-						if (params.farAway) {
-						  attachBoosterRockets()
+						if params.farAway then {
+						  attachBoosterRs()
 						}
 
 						params.rocketStages.foreach(stage => fuelUp(stage))
@@ -211,6 +212,159 @@
 							<tr>
 								<td>Direct</td>
 								<td style="background-color: #558B2F; text-align: center;">low</td>
+							</tr>
+						</tbody>
+						</table>
+					</textarea>
+				</section>
+				<section data-markdown>
+					<textarea data-template>
+						### Error handling: ZIO
+
+						```scala
+						abstract class AppException extends Exception
+						class UserNotFoundException extends AppException
+						class InvalidPasswordException extends AppException
+						```
+
+						---
+
+						### Error handling: ZIO
+
+						```scala [1-2|4-7|9-12]
+						val failingProgram: ZIO[Any, AppException, String] =
+						  ZIO.fail(UserNotFoundException())
+
+						val resultCatchAll: ZIO[Any, Nothing, String] =
+						  failingProgram.catchAll {
+							case _: UserNotFoundException => ZIO.succeed("✅")
+						  }
+
+						val resultCatchSome: ZIO[Any, AppException, String] =
+						  failingProgram.catchSome {
+						    case _: InvalidPasswordException => ZIO.succeed("✅")
+						  }
+						```
+						---
+
+						### Error handling: ZIO
+
+						```scala
+						// ...
+
+						for {
+						  r1 <- resultCatchAll
+						  _ <- Console.printLine(r1)
+						  r2 <- resultCatchSome
+						  _ <- Console.printLine(r2)
+						} yield ()
+						```
+
+						gives:
+
+						```
+						✅
+						timestamp=2024-02-01T14:08:18.365586Z level=ERROR
+						  cause="Exception in thread "zio-fiber-4"
+						  pres.UserNotFoundException: null
+						at pres.ZioHandleErrors$.$anonfun$1(Errors.scala:12)
+						at zio.ZIO$.fail$$anonfun$1(ZIO.scala:3148)
+						```
+
+						---
+
+						### Error handling: ZIO
+
+						```scala [1|3-5]
+						val failingProgram: UIO[Int] = ZIO.succeed(1 / 0)
+						val result1: ZIO[Any, Nothing, Int] =
+						  failingProgram.catchAll {
+						    case _: Exception => ZIO.succeed(42)
+						  }
+
+						result1.flatMap(Console.printLine)
+						```
+
+						gives:
+
+						```
+						timestamp=2024-02-01T14:25:16.796297Z level=ERROR
+						  cause="Exception in thread "zio-fiber-4"
+						  java.lang.ArithmeticException: / by zero
+						at pres.ZioDefects$.$anonfun$3(Errors.scala:26)
+						```
+
+						---
+
+						### Error handling: ZIO
+
+						```scala [1|3-5]
+						val failingProgram: UIO[Int] = ZIO.succeed(1 / 0)
+						val result2: ZIO[Any, Nothing, Int] =
+						  failingProgram.resurrect.catchAll {
+						    case _: Exception => ZIO.succeed(43)
+						  }
+
+						result2.flatMap(Console.printLine)
+						```
+
+						gives:
+
+						```
+						43
+						```
+
+						---
+
+						### Error handling: direct
+
+						```scala [1|3-4|6-7]
+						def failingProgram: String = throw UserNotFoundException()
+
+						def result1: String = try failingProgram
+						catch case _: UserNotFoundException => "✅"
+
+						def result2: String = try failingProgram
+						catch case _: InvalidPasswordException => "✅"
+
+						println(result1)
+						println(result2)
+						```
+
+						gives:
+
+						```
+						✅
+						Exception in thread "main" pres.UserNotFoundException
+						  at pres.Errors$package$.failingProgram$1(Errors.scala:52)
+						  at pres.Errors$package$.result2$3(Errors.scala:57)
+						  at pres.Errors$package$.directHandleErrors(Errors.scala:61)
+						  at pres.directHandleErrors.main(Errors.scala:51)
+						```
+
+						---
+
+						### Error handling: summary
+
+						<table>
+						<thead>
+							<tr>
+								<th></th>
+								<th>Error handling</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>ZIO</td>
+								<td style="background-color: #558B2F; text-align: center;">safe</td>
+							</tr>
+							<tr>
+								<td>ZIO-direct</td>
+								<td style="background-color: #558B2F; text-align: center;">safe</td>
+							</tr>
+							<tr>
+								<td>Direct</td>
+								<td style="background-color: #F57F17; text-align: center;">some</td>
 							</tr>
 						</tbody>
 						</table>

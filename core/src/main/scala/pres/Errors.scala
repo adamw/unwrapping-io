@@ -9,7 +9,7 @@ class InvalidPasswordException extends AppException
 
 object ZioHandleErrors extends ZIOAppDefault:
   override def run: ZIO[Any, Exception, Any] =
-    val failingProgram: ZIO[Any, AppException, Nothing] = ZIO.fail(UserNotFoundException())
+    val failingProgram: ZIO[Any, AppException, String] = ZIO.fail(UserNotFoundException())
 
     val result1: ZIO[Any, Nothing, String] = failingProgram.catchAll { case _: UserNotFoundException => ZIO.succeed("Caught") }
     val result2: ZIO[Any, AppException, String] = failingProgram.catchSome { case _: InvalidPasswordException => ZIO.succeed("Caught") }
@@ -48,13 +48,13 @@ object ZioDirectHandleErrors extends ZIOAppDefault:
 
     failingProgram1 *> failingProgram2
 
-object DirectHandleErrors extends App:
-  def failingProgram: Nothing = throw UserNotFoundException()
+@main def directHandleErrors(): Unit =
+  def failingProgram: String = throw UserNotFoundException()
 
-  def result1 = try failingProgram
+  def result1: String = try failingProgram
   catch case _: UserNotFoundException => "Caught"
 
-  def result2 = try failingProgram
+  def result2: String = try failingProgram
   catch case _: InvalidPasswordException => "Caught"
 
   println(result1)
