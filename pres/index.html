@@ -26,9 +26,10 @@
 
 						Adam Warski, February 2024
 
-						<a href="https://twitter.com/adamwarski">@adamwarski</a> / @softwaremill.social / softwaremill.com
+						<a href="https://twitter.com/adamwarski">@adamwarski</a> /
+						<a href="https://softwaremill.social/@adamwarski">@softwaremill.social</a>
 
-						<img src="img/sml.png" alt="SoftwareMill logo" style="height: 180px;">
+						<a href="https://softwaremill.com"><img src="img/sml.png" alt="SoftwareMill logo" style="height: 180px;"></a>
 					</textarea>
 				</section>
 				<section>
@@ -43,12 +44,12 @@
 				<section>
 					<h2>What did Loom introduce in Java 21?</h2>
 					<ul>
-						<li class="fragment">lightweight threads in the JVM</li>
-						<li class="fragment">built-in runtime</li>
+						<li class="fragment">lightweight threads on the JVM</li>
+						<li class="fragment">built-in asynchronous runtime</li>
 						<li class="fragment">retrofitting blocking operations</li>
 					</ul>
 
-					<p>Goal: simplify asynchronous programming<p>
+					<p class="fragment">Goal: simplify asynchronous programming<p>
 				</section>
 				<section data-markdown>
 					<textarea data-template>
@@ -68,13 +69,14 @@
 
 						1. lost control flow
 						2. lost context
-						3. viral
+						3. virality
 
 						---
 
-						### Scala's functional effect libraries
+						### How do functional effect libraries fit in?
 
 						What started as "better Futures", ended up bringing convenience and safety to many more areas
+						<!-- .element: class="fragment" -->
 
 						---
 
@@ -93,7 +95,7 @@
 						Which one to choose?
 
 						Definitely **not** a no-brainer!
-						Let's try no to throw out the baby with the bathwater!
+						<!-- .element: class="fragment" -->
 
 						---
 
@@ -108,8 +110,8 @@
 						### Let's zoom in ...
 
 						* Futures: Scala's std lib, Pekko, Akka
-						* Functional: cats-effect, **ZIO**, **kyo**
-						* Functional+direct: cats-effect-cps, **ZIO-direct**, **kyo-direct**
+						* Functional: cats-effect, **ZIO**, kyo
+						* Functional+direct: cats-effect-cps, **ZIO-direct**, kyo-direct
 						* Direct: **ox**, gears
 					</textarea>
 				</section>
@@ -609,6 +611,7 @@
 						### Fearless refactoring: ZIO-direct
 
 						```scala
+						import zio.direct.*
 						defer {
 						  val launch = Console.printLine("Launching rockets")
 
@@ -781,7 +784,7 @@
 						---
 						<!-- .element: data-transition="none" -->
 
-						### Resource management: Direct
+						### Resource management: Ox
 
 						```scala
 						supervised {
@@ -1103,75 +1106,75 @@
 						<tbody>
 							<tr>
 								<td>Syntax overhead</td>
-								<td style="background-color: #B71C1C; text-align: center;">high</td>
-								<td style="background-color: #F57F17; text-align: center;">mixed</td>
-								<td style="background-color: #558B2F; text-align: center;">low</td>
+								<td style="text-align: center;">💔</td>
+								<td style="text-align: center;">⚠️</td>
+								<td style="text-align: center;">🍀</td>
 							</tr>
 							<tr>
 								<td>Error handling</td>
-								<td style="background-color: #558B2F; text-align: center;">safe</td>
-								<td style="background-color: #558B2F; text-align: center;">safe</td>
-								<td style="background-color: #F57F17; text-align: center;">some</td>
+								<td style="text-align: center;">🍀</td>
+								<td style="text-align: center;">🍀</td>
+								<td style="text-align: center;">⚠️</td>
 							</tr>
 							<tr>
 								<td>Stack traces</td>
-								<td style="background-color: #B71C1C; text-align: center;">basic</td>
-								<td style="background-color: #B71C1C; text-align: center;">basic</td>
-								<td style="background-color: #558B2F; text-align: center;">useful</td>
+								<td style="text-align: center;">💔</td>
+								<td style="text-align: center;">💔</td>
+								<td style="text-align: center;">🍀</td>
 							</tr>
 							<tr>
 								<td>Coloring</td>
-								<td style="background-color: #B71C1C; text-align: center;">yes</td>
-								<td style="background-color: #B71C1C; text-align: center;">yes</td>
-								<td style="background-color: #558B2F; text-align: center;">no</td>
+								<td style="text-align: center;">💔</td>
+								<td style="text-align: center;">💔</td>
+								<td style="text-align: center;">🍀</td>
 							</tr>
 							<tr>
 								<td>Fearless refactoring</td>
-								<td style="background-color: #558B2F; text-align: center;">yes</td>
-								<td style="background-color: #F57F17; text-align: center;">some</td>
-								<td style="background-color: #B71C1C; text-align: center;">no</td>
+								<td style="text-align: center;">🍀</td>
+								<td style="text-align: center;">⚠️</td>
+								<td style="text-align: center;">💔</td>
 							</tr>
 							<tr>
 								<td>Resource management</td>
-								<td style="background-color: #558B2F; text-align: center;">safe</td>
-								<td style="background-color: #558B2F; text-align: center;">safe</td>
-								<td style="background-color: #F57F17; text-align: center;">some</td>
+								<td style="text-align: center;">🍀</td>
+								<td style="text-align: center;">🍀</td>
+								<td style="text-align: center;">⚠️</td>
 							</tr>
 							<tr>
 								<td>Supervision</td>
-								<td style="background-color: #F57F17; text-align: center;">some</td>
-								<td style="background-color: #F57F17; text-align: center;">some</td>
-								<td style="background-color: #558B2F; text-align: center;">yes</td>
+								<td style="text-align: center;">⚠️</td>
+								<td style="text-align: center;">⚠️</td>
+								<td style="text-align: center;">🍀</td>
 							</tr>
 							<tr>
 								<td>Interruptions</td>
-								<td style="background-color: #558B2F; text-align: center;">yes</td>
-								<td style="background-color: #558B2F; text-align: center;">yes</td>
-								<td style="background-color: #F57F17; text-align: center;">some</td>
+								<td style="text-align: center;">🍀</td>
+								<td style="text-align: center;">🍀</td>
+								<td style="text-align: center;">⚠️</td>
 							</tr>
 							<tr>
 								<td>High-level concurrency</td>
-								<td style="background-color: #558B2F; text-align: center;">yes</td>
-								<td style="background-color: #558B2F; text-align: center;">yes</td>
-								<td style="background-color: #558B2F; text-align: center;">yes</td>
+								<td style="text-align: center;">🍀</td>
+								<td style="text-align: center;">🍀</td>
+								<td style="text-align: center;">🍀</td>
 							</tr>
 							<tr>
 								<td>Testing support</td>
-								<td style="background-color: #558B2F; text-align: center;">yes</td>
-								<td style="background-color: #558B2F; text-align: center;">yes</td>
-								<td style="background-color: #F57F17; text-align: center;">some</td>
+								<td style="text-align: center;">🍀</td>
+								<td style="text-align: center;">🍀</td>
+								<td style="text-align: center;">⚠️</td>
 							</tr>
 							<tr>
 								<td>Thread-locals</td>
-								<td style="background-color: #558B2F; text-align: center;">yes</td>
-								<td style="background-color: #558B2F; text-align: center;">yes</td>
-								<td style="background-color: #558B2F; text-align: center;">yes</td>
+								<td style="text-align: center;">🍀</td>
+								<td style="text-align: center;">🍀</td>
+								<td style="text-align: center;">🍀</td>
 							</tr>
 							<tr>
 								<td>Ecosystem</td>
-								<td style="background-color: #F57F17; text-align: center;">some</td>
-								<td style="background-color: #F57F17; text-align: center;">some</td>
-								<td style="background-color: #F57F17; text-align: center;">some</td>
+								<td style="text-align: center;">⚠️</td>
+								<td style="text-align: center;">⚠️</td>
+								<td style="text-align: center;">⚠️</td>
 							</tr>
 						</tbody>
 						</table>
@@ -1212,6 +1215,35 @@
 						  "sttp", "tapir", "elasticmq",
 						  "struts", "hibernate envers")
 						```
+
+						---
+
+						<img src="img/scalar.svg" alt="Scalar logo" style="height: 180px;">
+
+						---
+
+						<a href="https://scalatimes.com">ScalaTimes</a>
+
+						---
+
+						### Links
+
+						* <a href="https://www.youtube.com/watch?v=sDnNjtkoUVs">Effects: To Be Or Not To Be?</a>
+						* <a href="https://www.youtube.com/watch?v=6RYn6mgq77s">Concurrency in Scala and on the JVM</a>
+						* <a href="https://github.com/softwaremill/ox">Ox</a>
+						* <a href="https://zio.dev">ZIO</a>
+
+						---
+
+						```scala
+						IO.pure("Thank you!")
+						```
+						<!-- .element: style="text-align: center; font-size:40px;" -->
+
+						<a href="https://softwaremill.com"><img src="img/sml.png" alt="SoftwareMill logo" style="height: 180px;"></a>
+
+						<a href="https://twitter.com/adamwarski">@adamwarski</a> /
+						<a href="https://softwaremill.social/@adamwarski">@softwaremill.social</a>
 					</textarea>
 				</section>
 			</div>
